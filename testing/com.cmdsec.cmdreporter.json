@@ -1,0 +1,54 @@
+{
+    "$schema": "http://json-schema.org/schema#",
+    "title": "cmdReporter Settings",
+    "description": "Domain: com.cmdsec.cmdreporter",
+    "properties": {
+        "AuditLevel": { "type": "integer", "title": "AuditLevel", "description": "Audit Level", "enum": [1, 2, 3],"enum_titles": [1, 2, 3], "default": "1"},
+        "AuditEventLogVerboseMessages": { "type": "boolean", "title": "AuditEventLogVerboseMessages","default": "false"},
+        "AuditEventExcludedUsers": { "type": "array", "title": "AuditEventExcludedUsers", "items": {"type": "string", "title": "Excluded User"}},
+        "AuditEventExcludedProcesses": { "type": "array", "title": "AuditEventExcludedProcesses", "items": {"type": "string", "title": "Excluded Processes"}},
+        "FileEventExclusionPaths": { "type": "array", "title": "FileEventExclusionPaths", "items": {"type": "string", "title": "Excluded Paths"}},
+        "FileEventInclusionPaths": { "type": "array", "title": "FileEventInclusionPaths", "items": {"type": "string", "title": "Included Paths"}},
+        "LogRemoteEndpointEnabled": { "type": "boolean", "title": "LogRemoteEndpointEnabled","default": "false"},
+        "LogRemoteEndpointURL": { "type": "boolean", "title": "LogRemoteEndpointURL","default": "false"},
+        "LogRemoteEndpointType": { "type": "string", "title": "LogRemoteEndpointType"},
+        "LogRemoteEndpointKafka": {
+            "type": "object",
+            "title": "LogRemoteEndpointKafka",
+            "description": "",
+            "properties": {
+                "TLSServerCertificate": {"type": "string", "title": "TLSServerCertificate"},
+                "TLSClientCertificate": {"type": "string", "title": "TLSClientCertificate"},
+                "TLSClientPrivateKey": {"type": "string", "title": "TLSClientPrivateKey"},
+                "TopicName": {"type": "string", "title": "TopicName", "default": "cmdReporter"}   
+            }
+        },
+        "LogRemoteEndpointREST": {
+            "type": "object",
+            "title": "LogRemoteEndpointREST",
+            "description": "",
+            "properties": {
+                "PublicKeyHash": {"type": "string", "title": "PublicKeyHash"}
+            }
+        },
+        "LogRemoteEndpointTLS": {
+            "type": "object",
+            "title": "LogRemoteEndpointTLS",
+            "description": "",
+            "properties": {
+                "TLSServerCertificate": {"type": "string", "title": "TLSServerCertificate"}
+            }
+        },
+        "SyslogFormatEnabled": {"type": "boolean", "title": "SyslogFormatEnabled", "default": "false"},
+        "UnifiedLogPredicates": { "type": "array", "title": "UnifiedLogPredicates", "items": {"type": "string", "title": "Predicates"}},
+        "LicenseEmail": {"type": "string", "title": "LicenseEmail"},
+        "LicenseExpirationDate": {"type": "string", "title": "LicenseExpirationDate"},
+        "LicenseKey": {"type": "string", "title": "LicenseKey"},
+        "LicenseType": {"type": "string", "title": "LicenseType"},
+        "LicenseVersion": {"type": "string", "title": "LicenseVersion"},
+        "LogFileMaxNumberBackups": { "type": "integer", "title": "LogFileMaxNumberBackups", "description": "LogFileMaxNumberBackups", "default": "10"},
+        "LogFileMaxSizeMegaBytes": { "type": "string", "title": "LogFileMaxSizeMegaBytes", "description": "LogFileMaxSizeMegaBytes", "default": "50"},
+        "LogFileOwnership": { "type": "string", "title": "LogFileOwnership", "description": "LogFileOwnership", "default": "root:wheel"},
+        "LogFilePermission": { "type": "string", "title": "LogFilePermission", "description": "LogFilePermission", "default": "644"}
+    }
+}
