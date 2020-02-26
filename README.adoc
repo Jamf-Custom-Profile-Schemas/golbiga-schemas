@@ -1,1 +1,5 @@
 # Jamf Custom Profile Schemas
+
+=== Schemas for Jamf Pro's Application & Custom Setting Payload
+
+* cmdReporter (Testing)
