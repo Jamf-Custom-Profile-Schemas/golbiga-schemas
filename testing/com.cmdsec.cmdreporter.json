@@ -1,54 +1,381 @@
 {
-    "$schema": "http://json-schema.org/schema#",
     "title": "cmdReporter Settings",
     "description": "Domain: com.cmdsec.cmdreporter",
-    "properties": {
-        "AuditLevel": { "type": "integer", "title": "AuditLevel", "description": "Audit Level", "enum": [1, 2, 3],"enum_titles": [1, 2, 3], "default": "1"},
-        "AuditEventLogVerboseMessages": { "type": "boolean", "title": "AuditEventLogVerboseMessages","default": "false"},
-        "AuditEventExcludedUsers": { "type": "array", "title": "AuditEventExcludedUsers", "items": {"type": "string", "title": "Excluded User"}},
-        "AuditEventExcludedProcesses": { "type": "array", "title": "AuditEventExcludedProcesses", "items": {"type": "string", "title": "Excluded Processes"}},
-        "FileEventExclusionPaths": { "type": "array", "title": "FileEventExclusionPaths", "items": {"type": "string", "title": "Excluded Paths"}},
-        "FileEventInclusionPaths": { "type": "array", "title": "FileEventInclusionPaths", "items": {"type": "string", "title": "Included Paths"}},
-        "LogRemoteEndpointEnabled": { "type": "boolean", "title": "LogRemoteEndpointEnabled","default": "false"},
-        "LogRemoteEndpointURL": { "type": "boolean", "title": "LogRemoteEndpointURL","default": "false"},
-        "LogRemoteEndpointType": { "type": "string", "title": "LogRemoteEndpointType"},
-        "LogRemoteEndpointKafka": {
+	"options": {
+    	"remove_empty_properties": true
+  	},
+    "properties":
+    {
+        "AuditLevel":
+        {
+            "type": "integer",
+            "title": "AuditLevel",
+            "description": "Log Verbosity Level. Recommended: 1 or 2",
+            "enum": [1, 2, 3],
+            "enum_titles": [1, 2, 3],
+            "default": 1
+        },
+        "AuditEventLogVerboseMessages":
+        {
+            "type": "boolean",
+            "title": "AuditEventLogVerboseMessages",
+            "default": false,
+            "description": "Log messages cmdReporter deems non-critical. Recommended: false"
+        },
+        "AuditEventExcludedUsers":
+        {
+            "type": "array",
+            "description": "Users to exclude from audit logging. Recommended: None",
+            "title": "AuditEventExcludedUsers",
+            "options":
+            {
+                "infoText": "Key: AllowedEmailDomains"
+            },
+            "items":
+            {
+                "type": "string",
+                "title": "Excluded User",
+                "options":
+                {
+                    "inputAttributes":
+                    {
+                        "placeholder": "dan"
+                    }
+                }
+            }
+        },
+        "AuditEventExcludedProcesses":
+        {
+            "type": "array",
+            "title": "AuditEventExcludedProcesses",
+            "description": "Applications or processes to exclude from logging. Recommended: Only other security software",
+            "items":
+            {
+                "type": "string",
+                "title": "Excluded Processes",
+                "options":
+                {
+                    "inputAttributes":
+                    {
+                        "placeholder": "/Applications/Security Tool.app"
+                    }
+                }
+            }
+        },
+        "FileEventExclusionPaths":
+        {
+            "type": "array",
+            "title": "FileEventExclusionPaths",
+            "description": "Regex defined exclusion paths for file events. Rules combined with FileEventInclusionPaths",
+            "items":
+            {
+                "type": "string",
+                "title": "Excluded Paths",
+                "options":
+                {
+                    "inputAttributes":
+                    {
+                        "placeholder": "/etc/security/.*"
+                    }
+                }
+            }
+        },
+        "FileEventInclusionPaths":
+        {
+            "type": "array",
+            "title": "FileEventInclusionPaths",
+            "description": "Regex defined inclusion paths for file events. Rules combined with FileEventExclusionPaths",
+            "items":
+            {
+                "type": "string",
+                "title": "Included File Paths",
+                "options":
+                {
+                    "inputAttributes":
+                    {
+                        "placeholder": "/etc/cups/.*"
+                    }
+                }
+            }
+        },
+        "FileEventUseFuzzyMatch":
+        {
+            "type": "boolean",
+            "title": "FileEventUseFuzzyMatch",
+            "default": false,
+            "description": "Changes the regex evaluation logic to scan through the file path searching for where the regular expression pattern produces a match."
+        },
+        "LogRemoteEndpointEnabled":
+        {
+            "type": "boolean",
+            "title": "LogRemoteEndpointEnabled",
+            "description": "Master switch for sending logs to remote destinations. Recommended: true",
+            "default": false
+        },
+        "LogRemoteEndpointURL":
+        {
+            "type": "string",
+            "title": "LogRemoteEndpointURL",
+            "description": "Full URL with port number where logs will be sent. NOTE: Prepends change with server type, see https://wiki.cmdreporter.com/support/solutions/folders/12000014491",
+            "options":
+            {
+                "inputAttributes":
+                {
+                    "placeholder": "https://company.splunk.server:443/services/collector/raw"
+                }
+            }
+        },
+        "LogRemoteEndpointType":
+        {
+            "type": "string",
+            "title": "LogRemoteEndpointType",
+            "description": "Switch which configuration is used for remote transmission. LogRemoteEndpoint(value) are additional configurations. Recommended: Splunk",
+            "enum": ["REST", "Kafka", "Splunk", "TLS", "AWSKinesis"],
+            "enum_titles": ["REST", "Kafka", "Splunk", "TLS", "AWSKinesis"],
+            "default": "Splunk"
+        },
+        "LogRemoteEndpointAWSKinesis":
+        {
+            "type": "object",
+            "title": "LogRemoteEndpointAWSKinesis",
+            "description": "Send logs directly to an AWS Kinesis stream",
+            "properties":
+            {
+                "AccessKeyID":
+                {
+                    "type": "string",
+                    "title": "AWS Access Key ID",
+                    "description": "(Required) AWS Access Key ID",
+                    "options":
+                    {
+                        "inputAttributes":
+                        {
+                            "placeholder": "EJNPQUNWGIJWHEPK70DE"
+                        }
+                    }
+                },
+                "SecretKey":
+                {
+                    "type": "string",
+                    "title": "AWS Secret Key",
+                    "description": "(Required) AWS Secret Key",
+                    "options":
+                    {
+                        "inputAttributes":
+                        {
+                            "placeholder": "vOQd2pqNMyNR3CetPbrEhzfT..."
+                        }
+                    }
+                },
+                "StreamName":
+                {
+                    "type": "string",
+                    "title": "AWS Kinesis Stream Name",
+                    "description": "(Required) AWS Kinesis Stream Name (NOT ARN)",
+                    "options":
+                    {
+                        "inputAttributes":
+                        {
+                            "placeholder": "cmdReporter"
+                        }
+                    }
+                },
+                "Region":
+                {
+                    "type": "string",
+                    "title": "Region",
+                    "description": "(Required)",
+                    "default": "us-east-1"
+                }
+            }
+        },
+        "LogRemoteEndpointKafka":
+        {
             "type": "object",
             "title": "LogRemoteEndpointKafka",
-            "description": "",
-            "properties": {
-                "TLSServerCertificate": {"type": "string", "title": "TLSServerCertificate"},
-                "TLSClientCertificate": {"type": "string", "title": "TLSClientCertificate"},
-                "TLSClientPrivateKey": {"type": "string", "title": "TLSClientPrivateKey"},
-                "TopicName": {"type": "string", "title": "TopicName", "default": "cmdReporter"}   
+            "description": "Configure certificate and topic for Apache Kafka",
+            "properties":
+            {
+                "TopicName":
+                {
+                    "type": "string",
+                    "title": "TopicName",
+                    "description": "(Required) Kafka topic cmdReporter will publish to",
+                    "default": "cmdReporter"
+                },
+                "TLSServerCertificate":
+                {
+                    "type": "array",
+                    "title": "TLSServerCertificate",
+                    "description": "(Required) Common names for server certificate trust chain.",
+                    "items":
+                    {
+                        "type": "string",
+                        "title": "Certificate Common Name",
+                        "options":
+                        {
+                            "infoText": "Maps to Kafka setting ssl.ca.location",
+                            "inputAttributes":
+                            {
+                                "placeholder": "Apple Root CA - G2"
+                            }
+                        }
+                    }
+
+                },
+                "TLSClientCertificate":
+                {
+                    "type": "string",
+                    "title": "TLSClientCertificate",
+                    "description": "(Optional) PEM formatted client certificate.",
+                    "options":
+                    {
+                        "infoText": "Maps to Kafka setting ssl.certificate.location",
+                        "inputAttributes":
+                        {
+                            "placeholder": "-----BEGIN CERTIFICATE-----..."
+                        }
+                    }
+                },
+                "TLSClientPrivateKey":
+                {
+                    "type": "string",
+                    "title": "TLSClientPrivateKey",
+                    "description": "(Optional) PEM formatted client private key",
+                    "options":
+                    {
+                        "infoText": "Maps to Kafka setting ssl.key.location",
+                        "inputAttributes":
+                        {
+                            "placeholder": "-----BEGIN CERTIFICATE-----..."
+                        }
+                    }
+                }
             }
         },
-        "LogRemoteEndpointREST": {
+        "LogRemoteEndpointREST":
+        {
             "type": "object",
             "title": "LogRemoteEndpointREST",
-            "description": "",
-            "properties": {
-                "PublicKeyHash": {"type": "string", "title": "PublicKeyHash"}
+            "description": "REST or Splunk HEC settings. PublicKeyHash applies to both methods.",
+            "properties":
+            {
+                "PublicKeyHash":
+                {
+                    "type": "string",
+                    "title": "PublicKeyHash",
+                    "description": "(Required) REST or Splunk HEC API key"
+                }
             }
         },
-        "LogRemoteEndpointTLS": {
+        "LogRemoteEndpointTLS":
+        {
             "type": "object",
             "title": "LogRemoteEndpointTLS",
             "description": "",
-            "properties": {
-                "TLSServerCertificate": {"type": "string", "title": "TLSServerCertificate"}
+            "properties":
+            {
+                "TLSServerCertificate":
+                {
+                    "type": "array",
+                    "title": "TLSServerCertificate",
+                    "description": "(Required) Common names for server certificate trust chain.",
+                    "items":
+                    {
+                        "type": "string",
+                        "title": "Certificate Common Name",
+                        "options":
+                        {
+                            "inputAttributes":
+                            {
+                                "placeholder": "Apple Root CA - G2"
+                            }
+                        }
+                    }
+
+                }
             }
         },
-        "SyslogFormatEnabled": {"type": "boolean", "title": "SyslogFormatEnabled", "default": "false"},
-        "UnifiedLogPredicates": { "type": "array", "title": "UnifiedLogPredicates", "items": {"type": "string", "title": "Predicates"}},
-        "LicenseEmail": {"type": "string", "title": "LicenseEmail"},
-        "LicenseExpirationDate": {"type": "string", "title": "LicenseExpirationDate"},
-        "LicenseKey": {"type": "string", "title": "LicenseKey"},
-        "LicenseType": {"type": "string", "title": "LicenseType"},
-        "LicenseVersion": {"type": "string", "title": "LicenseVersion"},
-        "LogFileMaxNumberBackups": { "type": "integer", "title": "LogFileMaxNumberBackups", "description": "LogFileMaxNumberBackups", "default": "10"},
-        "LogFileMaxSizeMegaBytes": { "type": "string", "title": "LogFileMaxSizeMegaBytes", "description": "LogFileMaxSizeMegaBytes", "default": "50"},
-        "LogFileOwnership": { "type": "string", "title": "LogFileOwnership", "description": "LogFileOwnership", "default": "root:wheel"},
-        "LogFilePermission": { "type": "string", "title": "LogFilePermission", "description": "LogFilePermission", "default": "644"}
+        "UnifiedLogPredicates":
+        {
+            "type": "array",
+            "title": "UnifiedLogPredicates",
+            "description": "Search terms that will be collected from the unified log systems.",
+            "items":
+            {
+                "type": "string",
+                "title": "Predicates",
+                "description": "Search terms that will be collected from the unified log systems.",
+                "options":
+                {
+                    "inputAttributes":
+                    {
+                        "placeholder": "(subsystem == \"com.apple.securityd\")"
+                    }
+                }
+            }
+        },
+        "LicenseEmail":
+        {
+            "type": "string",
+            "title": "LicenseEmail",
+            "description": "(Required)"
+        },
+        "LicenseExpirationDate":
+        {
+            "type": "string",
+            "title": "LicenseExpirationDate",
+            "description": "(Required) Format: 01/20/2020"
+        },
+        "LicenseKey":
+        {
+            "type": "string",
+            "title": "LicenseKey",
+            "description": "(Required)"
+        },
+        "LicenseType":
+        {
+            "type": "string",
+            "title": "LicenseType",
+            "enum": ["Trial", "Annual"],
+            "enum_titles": ["Trial", "Annual"],
+            "default": "Annual",
+            "description": "(Required)"
+        },
+        "LicenseVersion":
+        {
+            "type": "string",
+            "title": "LicenseVersion",
+            "description": "(Required) Always leave at 1",
+            "default": "1"
+        },
+        "LogFileMaxNumberBackups":
+        {
+            "type": "integer",
+            "title": "LogFileMaxNumberBackups",
+            "description": "Maximum number of archived backups to keep before deleting oldest.",
+            "default": "10"
+        },
+        "LogFileMaxSizeMegaBytes":
+        {
+            "type": "integer",
+            "title": "LogFileMaxSizeMegaBytes",
+            "description": "Maximum log file size before rotating.",
+            "default": "50"
+        },
+        "LogFileOwnership":
+        {
+            "type": "string",
+            "title": "LogFileOwnership",
+            "description": "User and group ownership of log files",
+            "default": "root:wheel"
+        },
+        "LogFilePermission":
+        {
+            "type": "integer",
+            "title": "LogFilePermission",
+            "description": "Octal permissions for live and archived log files.",
+            "default": "644"
+        }
     }
 }
